@@ -1,7 +1,6 @@
 package com.ztf.talk;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.openapi.wm.ToolWindowManager;
@@ -61,6 +60,7 @@ public class TalkMessage implements ToolWindowFactory {
                     Manager.getSocket().receive(packet);
                     Message receive = (Message) SerializeUtils.deserialize(packet.getData());
                     System.out.println("receive message :" + receive);
+                    //如果发送的是 查找用户请求，返回用户名称。and receiveuser，双方添加
                     User newUser = new User(receive.getSendUser(), packet.getAddress().getHostAddress(), true);
                     Manager.getUsers().add(newUser);
 
@@ -79,8 +79,15 @@ public class TalkMessage implements ToolWindowFactory {
                         });
                     }
 */
-                    //接收到的记录 保存起来
-                    if (!receive.isFindUser()) {
+                    if (receive.isFindUser()) {
+                        if (!receive.isFindUserReceive()) {
+                            //查找用户请求，返回用户名
+                            receive.setFindUserReceive(true);
+                            receive.setReceiveUser(Manager.getUserName());//接收到的请求
+                            Manager.sendMessage(receive, packet.getAddress());
+                        }
+                    } else {
+                        //接收到的记录 保存起来
                         StringBuffer stringBuffer = messages.get(packet.getAddress().getHostAddress());
                         if (stringBuffer == null) {
                             messages.put(packet.getAddress().getHostAddress(), new StringBuffer(receive.toString()));
@@ -95,7 +102,7 @@ public class TalkMessage implements ToolWindowFactory {
                         }
                     }
                     StringBuffer buffer = messages.get(packet.getAddress().getHostAddress());
-                    oldMessage.setText(buffer!=null?buffer.toString():"");
+                    oldMessage.setText(buffer != null ? buffer.toString() : "");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

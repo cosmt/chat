@@ -29,7 +29,7 @@ public class TalkWindow implements ToolWindowFactory {
             //刷新 user
             Manager.findUser();
             try {
-                Thread.sleep(500);
+                Thread.sleep(1000);
                 //刷新 用户列表
                 users.setListData(Manager.getUsers().toArray());
             } catch (InterruptedException e1) {

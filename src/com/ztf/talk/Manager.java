@@ -94,6 +94,10 @@ public class Manager {
         }
     }
 
+    public static String getUserName() {
+        return userName;
+    }
+
     public static StringBuffer getMessage(String host) {
         return TalkMessage.getMessages().get(host);
     }
