@@ -21,6 +21,8 @@
     <depends>com.intellij.modules.lang</depends>
     -->
 
+    <depends>com.intellij.modules.lang</depends>
+
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
         <toolWindow id="Talk" anchor="right" secondary="true" factoryClass="com.ztf.talk.TalkWindow"/>
