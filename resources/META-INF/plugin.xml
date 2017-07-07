@@ -1,0 +1,35 @@
+<idea-plugin>
+    <id>com.ztf.talk</id>
+    <name>talk</name>
+    <version>1.0</version>
+    <vendor email="279059537@qq.com">赵腾飞</vendor>
+
+    <description><![CDATA[
+      局域网内通信插件
+    ]]></description>
+
+    <change-notes><![CDATA[
+    ]]>
+    </change-notes>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+    <idea-version since-build="145.258"/>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <!-- uncomment to enable plugin in all products
+    <depends>com.intellij.modules.lang</depends>
+    -->
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Add your extensions here -->
+        <toolWindow id="Talk" anchor="right" secondary="true" factoryClass="com.ztf.talk.TalkWindow"/>
+        <toolWindow id="TalkMessage" anchor="bottom" factoryClass="com.ztf.talk.TalkMessage"/>
+    </extensions>
+
+    <actions>
+        <!-- Add your actions here -->
+
+    </actions>
+
+</idea-plugin>
