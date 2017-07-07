@@ -1,6 +1,7 @@
 package com.ztf.talk;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.openapi.wm.ToolWindowManager;
@@ -23,6 +24,8 @@ public class TalkMessage implements ToolWindowFactory {
     private JTextArea newMessage;
     private JButton sendButton;
     private JLabel label;
+    private JScrollPane newScrollPane;
+    private JScrollPane oldScrollPane;
 
     //<String ,StringBuffer>  string:hostip  message:message缓存
     private static Map<String, StringBuffer> messages = new HashMap<>();
@@ -60,6 +63,7 @@ public class TalkMessage implements ToolWindowFactory {
                     System.out.println("receive message :" + receive);
                     User newUser = new User(receive.getSendUser(), packet.getAddress().getHostAddress(), true);
                     Manager.getUsers().add(newUser);
+
                     //提示收到消息
 /*
                     if (me.isActive()) {

@@ -20,6 +20,7 @@ public class TalkWindow implements ToolWindowFactory {
     private JButton refursh;
     private JList users;
     private JLabel label;
+    private JScrollPane usersScrollPane;
     //实例化 ToolWindowManager
     private ToolWindowManager instance;
 
