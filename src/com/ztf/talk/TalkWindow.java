@@ -23,13 +23,14 @@ public class TalkWindow implements ToolWindowFactory {
     private JScrollPane usersScrollPane;
     //实例化 ToolWindowManager
     private ToolWindowManager instance;
+    public static TalkWindow talkWindow;
 
     public TalkWindow() {
         refursh.addActionListener(e -> {
             //刷新 user
             Manager.findUser();
             try {
-                Thread.sleep(1000);
+                Thread.sleep(500);
                 //刷新 用户列表
                 users.setListData(Manager.getUsers().toArray());
             } catch (InterruptedException e1) {
@@ -47,8 +48,14 @@ public class TalkWindow implements ToolWindowFactory {
                         ToolWindow talkMessage = instance.getToolWindow("TalkMessage");
                         if (talkMessage != null) {
                             TalkMessage.user = (User) users.getSelectedValue();
-                            System.out.println(TalkMessage.user);
                             talkMessage.show(() -> {
+                                TalkMessage message = TalkMessage.talkMessage;
+                                if (message != null) {
+                                    StringBuffer buffer = TalkMessage.getMessages().get(TalkMessage.user.getHost());
+                                    if (buffer != null) {
+                                        message.getOldMessage().setText(buffer.toString());
+                                    }
+                                }
                             });
                         }
                     }
@@ -63,8 +70,64 @@ public class TalkWindow implements ToolWindowFactory {
         instance = ToolWindowManager.getInstance(project);
 
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-        Content content = contentFactory.createContent(talkWindowContent, "", false);
+        Content content = contentFactory.createContent(talkWindowContent, "talkwindow", false);
         toolWindow.getContentManager().addContent(content);
+        talkWindow = this;
     }
 
+    public JPanel getTalkWindowContent() {
+        return talkWindowContent;
+    }
+
+    public void setTalkWindowContent(JPanel talkWindowContent) {
+        this.talkWindowContent = talkWindowContent;
+    }
+
+    public JButton getRefursh() {
+        return refursh;
+    }
+
+    public void setRefursh(JButton refursh) {
+        this.refursh = refursh;
+    }
+
+    public JList getUsers() {
+        return users;
+    }
+
+    public void setUsers(JList users) {
+        this.users = users;
+    }
+
+    public JLabel getLabel() {
+        return label;
+    }
+
+    public void setLabel(JLabel label) {
+        this.label = label;
+    }
+
+    public JScrollPane getUsersScrollPane() {
+        return usersScrollPane;
+    }
+
+    public void setUsersScrollPane(JScrollPane usersScrollPane) {
+        this.usersScrollPane = usersScrollPane;
+    }
+
+    public ToolWindowManager getInstance() {
+        return instance;
+    }
+
+    public void setInstance(ToolWindowManager instance) {
+        this.instance = instance;
+    }
+
+    public static TalkWindow getTalkWindow() {
+        return talkWindow;
+    }
+
+    public static void setTalkWindow(TalkWindow talkWindow) {
+        TalkWindow.talkWindow = talkWindow;
+    }
 }

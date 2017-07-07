@@ -1,6 +1,7 @@
 package com.ztf.talk;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.openapi.wm.ToolWindowManager;
@@ -25,12 +26,14 @@ public class TalkMessage implements ToolWindowFactory {
     private JLabel label;
     private JScrollPane newScrollPane;
     private JScrollPane oldScrollPane;
+    public static TalkMessage talkMessage;
 
     //<String ,StringBuffer>  string:hostip  message:message缓存
     private static Map<String, StringBuffer> messages = new HashMap<>();
     //当前聊天窗口的user
     public static User user;
     private ToolWindow me;
+    private ToolWindowManager toolWindowManager;
 
 
     public TalkMessage() {
@@ -64,27 +67,22 @@ public class TalkMessage implements ToolWindowFactory {
                     User newUser = new User(receive.getSendUser(), packet.getAddress().getHostAddress(), true);
                     Manager.getUsers().add(newUser);
 
-                    //提示收到消息
-/*
-                    if (me.isActive()) {
-                        //活跃状态，判断是否未当前用户，如果不是，则提示，并切换.
-                        if (!user.getAddress().equals(packet.getAddress().getHostAddress())) {
-
-                            int i = Messages.showOkCancelDialog("收到来自 " + newUser + "的新消息，是否切换显示", "new message", Messages.getQuestionIcon());
-                            System.out.println(i);
-                        }
-                    } else {
-                        //不活跃。直接强制弹出消息
-                        me.show(() -> {
-                        });
-                    }
-*/
                     if (receive.isFindUser()) {
-                        if (!receive.isFindUserReceive()) {
+                        TalkWindow window = TalkWindow.talkWindow;
+
+                        if (receive.isFindUserReceive()) {
+                            //查找用户请求，返回用户名
+                            if (window != null) {
+                                window.getUsers().setListData(Manager.getUsers().toArray());
+                            }
+                        } else {
                             //查找用户请求，返回用户名
                             receive.setFindUserReceive(true);
                             receive.setReceiveUser(Manager.getUserName());//接收到的请求
                             Manager.sendMessage(receive, packet.getAddress());
+                            if (window != null) {
+                                window.getUsers().setListData(Manager.getUsers().toArray());
+                            }
                         }
                     } else {
                         //接收到的记录 保存起来
@@ -94,6 +92,27 @@ public class TalkMessage implements ToolWindowFactory {
                         } else {
                             stringBuffer.append('\n').append(receive.toString());
                         }
+
+                        //提示收到消息
+                        if (toolWindowManager != null) {
+                            SwingUtilities.invokeLater(() -> {
+
+                                if (!me.isActive()) {
+                                    //活跃状态，判断是否为当前用户，如果不是，则提示，并切换.
+                                    if (!user.getHost().equals(packet.getAddress().getHostAddress())) {
+                                        //展示消息
+                                        Messages.showInfoMessage(receive.toString(), "new message");
+                                    }
+                                } else {
+                                    //不活跃。直接强制弹出消息
+                                    TalkMessage.user = user;
+                                    talkMessage.getOldMessage().setText(messages.get(user.getHost()).toString());
+                                    me.show(() -> {
+                                    });
+                                }
+                            });
+                        }
+
                     }
                     //刷新显示
                     for (User user : Manager.getUsers()) {
@@ -114,10 +133,11 @@ public class TalkMessage implements ToolWindowFactory {
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-        Content content = contentFactory.createContent(talkMessagePanel, "", false);
+        Content content = contentFactory.createContent(talkMessagePanel, "talkmessage", false);
         toolWindow.getContentManager().addContent(content);
-        me = ToolWindowManager.getInstance(project).getToolWindow("TalkMessage");
-
+        toolWindowManager = ToolWindowManager.getInstance(project);
+        me = toolWindowManager.getToolWindow("TalkMessage");
+        talkMessage = this;
     }
 
     public JPanel getTalkMessagePanel() {
